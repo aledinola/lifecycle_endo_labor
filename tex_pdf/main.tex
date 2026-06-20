@@ -61,7 +61,7 @@ For working ages, $j<J_R$,
 \tilde l(a',a,\eta,j,\theta)
 =\nu +(1-\nu)\frac{a'-available}{wage},
 \]
-and the implemented labor supply is
+and the constrained labor supply is
 \[
 l(a',a,\eta,j,\theta)
 =\min\left\{\max\left\{\tilde l(a',a,\eta,j,\theta),0\right\},
@@ -111,8 +111,12 @@ z'=\rho z+\varepsilon',\quad
 \]
 with $\rho=0.985$ and innovation variance $\sigma_\varepsilon=0.022$.
 The corresponding innovation standard deviation is $\sqrt{0.022}$. The code
-stores $\eta=\exp(z)$ after discretization. The two permanent productivity
-types are
+stores $\eta=\exp(z)$ after discretization. Let
+\[
+\pi(\eta,\eta')=\Pr(\eta_{j+1}=\eta'\mid \eta_j=\eta)
+\]
+denote the transition probability induced by the discretized Markov chain.
+The two permanent productivity types are
 \[
 \theta_1=\exp(-\sqrt{\sigma_\theta}),\quad
 \theta_2=\exp(\sqrt{\sigma_\theta}),
@@ -126,19 +130,20 @@ the two permanent types.
 
 \item Distribution:
 \[
-\mu(a',\eta',j+1,\theta)
+\mu(a_k,\eta',j+1,\theta)
 =\sum_a\sum_\eta
-I\{a'=g_a(a,\eta,j,\theta)\}
-\pi(\eta,\eta')\mu(a,\eta,j,\theta),
+q_k(g_a(a,\eta,j,\theta))\pi(\eta,\eta')\mu(a,\eta,j,\theta),
 \]
-for $j=1,\ldots,J-1$. If $g_a(a,\eta,j,\theta)$ is not a grid point, the
+for $j=1,\ldots,J-1$, where $q_k(\cdot)$ is the interpolation weight on
+asset grid point $a_k$. If $g_a(a,\eta,j,\theta)$ is not a grid point, the
 code linearly redistributes mass across the two neighboring asset-grid
-points. Let $a_k\leq a'<a_{k+1}$ and choose $\omega$ such that
+points. Let $a_k\leq g_a(a,\eta,j,\theta)<a_{k+1}$ and choose $\omega$ such
+that
 \[
-a'=\omega a_k+(1-\omega)a_{k+1}.
+g_a(a,\eta,j,\theta)=\omega a_k+(1-\omega)a_{k+1}.
 \]
-Then the algorithm assigns the fraction $\omega$ of the mass to $a_k$ and
-the fraction $1-\omega$ to $a_{k+1}$.
+Then $q_k=\omega$, $q_{k+1}=1-\omega$, and all other asset-grid weights are
+zero.
 
 The initial distribution is
 \[
