@@ -1,0 +1,18 @@
+# Fortran build artifacts
+codes_fortran/obj/
+codes_fortran/exe/
+codes_fortran/*.mod
+codes_fortran/*.obj
+codes_fortran/output.out
+codes_fortran/gnufigure_*
+
+# TeX build artifacts
+tex_pdf/*.aux
+tex_pdf/*.log
+tex_pdf/*.out
+tex_pdf/*.toc
+tex_pdf/*.synctex.gz
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

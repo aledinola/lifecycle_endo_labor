@@ -1,0 +1,28 @@
+COMPILER=ifx
+SWITCH=/warn:all /Qopenmp /O2
+OBJDIR=obj
+EXEDIR=exe
+EXEC=$(EXEDIR)\lifecycle_endo_labor.exe
+OBJS=$(OBJDIR)\toolbox.obj
+
+all: dirs $(EXEC)
+
+dirs:
+	@if not exist "$(OBJDIR)" mkdir "$(OBJDIR)"
+	@if not exist "$(EXEDIR)" mkdir "$(EXEDIR)"
+
+$(OBJDIR)\toolbox.obj: toolbox.f90
+	$(COMPILER) $(SWITCH) -c toolbox.f90 /object:$(OBJDIR)\toolbox.obj /module:$(OBJDIR)
+
+$(EXEC): $(OBJS) sol_prog10_07m.f90 sol_prog10_07.f90
+	$(COMPILER) $(SWITCH) /I$(OBJDIR) sol_prog10_07.f90 $(OBJS) /exe:$(EXEC)
+
+run: all
+	$(EXEC)
+
+clean:
+	@if exist "$(OBJDIR)" rmdir /s /q "$(OBJDIR)"
+	@if exist "$(EXEDIR)" rmdir /s /q "$(EXEDIR)"
+	@if exist "*.mod" del /q "*.mod"
+	@if exist "output.out" del /q "output.out"
+	@if exist "gnufigure_*" del /q "gnufigure_*"
