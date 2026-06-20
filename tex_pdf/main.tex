@@ -72,9 +72,11 @@ $N_\eta=7$. The pension is
 pen_j=
 \begin{cases}
 0, & j<J_R,\\
-0.5\cdot 0.33\cdot \dfrac{1}{J_R-1}\sum_{s=1}^{J_R-1} e_s, & j\geq J_R.
+\kappa \tau_p \dfrac{1}{J_R-1}\sum_{s=1}^{J_R-1} e_s, & j\geq J_R,
 \end{cases}
 \]
+where $\kappa=0.5$ is the replacement parameter and $\tau_p=0.33$ is the
+pension contribution parameter.
 The period utility function is
 \[
 u(c,1-l)=
@@ -86,11 +88,12 @@ with $\nu=0.335$, $\gamma=0.50$, and $\beta=0.98$.
 The transitory productivity process is discretized as an AR(1) process,
 \[
 z'=\rho z+\varepsilon',\quad
-\varepsilon'\sim N(0,\sigma_\varepsilon^2),
+\varepsilon'\sim N(0,\sigma_\varepsilon),
 \]
-with $\rho=0.985$ and $\sigma_\varepsilon=0.022$. The code stores
-$\eta=\exp(z)$ after discretization. The two permanent productivity types
-are
+with $\rho=0.985$ and innovation variance $\sigma_\varepsilon=0.022$.
+The corresponding innovation standard deviation is $\sqrt{0.022}$. The code
+stores $\eta=\exp(z)$ after discretization. The two permanent productivity
+types are
 \[
 \theta_1=\exp(-\sqrt{\sigma_\theta}),\quad
 \theta_2=\exp(\sqrt{\sigma_\theta}),
