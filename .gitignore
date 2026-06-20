@@ -4,6 +4,7 @@ codes_fortran/exe/
 codes_fortran/*.mod
 codes_fortran/*.obj
 codes_fortran/output.out
+codes_fortran/output.txt
 codes_fortran/runtime_report.txt
 codes_fortran/gnufigure_*
 

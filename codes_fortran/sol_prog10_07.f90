@@ -143,7 +143,7 @@ contains
         call grid_Cons_Grow(a, a_l, a_u, a_grow)
 
         ! open files
-        open(21, file='output.out')
+        open(21, file='output.txt')
 
     end subroutine
 
