@@ -185,4 +185,10 @@ total & 0.195519 & \\
 \end{tabular}
 \end{center}
 
+The Fortran code was compiled with Intel oneAPI \texttt{ifx} using the
+makefile option string \texttt{/warn:all /Qopenmp /O2}. The speed-relevant
+options are \texttt{/O2}, which enables compiler optimization, and
+\texttt{/Qopenmp}, which enables OpenMP support. The \texttt{/warn:all}
+option is diagnostic rather than performance-oriented.
+
 \end{document}
