@@ -10,7 +10,7 @@ This repository compares solutions of a life-cycle model with endogenous labor s
 
 ## Fortran Baseline
 
-The current Fortran source solves the baseline model using value function iteration, computes the household distribution over state space, aggregates cohort outcomes, and writes the table `output.out` when run.
+The current Fortran source solves the baseline model using value function iteration, computes the household distribution over state space, aggregates cohort outcomes, and writes the table `output.out` when run. It also writes `runtime_report.txt` with total runtime and separate timings for `solve_household`, `get_distribution`, and `aggregation`.
 
 On Windows with Intel oneAPI initialized:
 

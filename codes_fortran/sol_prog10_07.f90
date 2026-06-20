@@ -15,26 +15,40 @@ include "sol_prog10_07m.f90"
 program LaborSupply
 
     use globals
+    use omp_lib, only: omp_get_wtime
 
     implicit none
+    real*8 :: phase_start, total_start, total_runtime
+    real*8 :: time_solve_household, time_get_distribution, time_aggregation
 
     ! initialize remaining variables
     call initialize()
 
     ! start the clock
     call tic()
+    total_start = omp_get_wtime()
 
     ! solve the household problem
+    phase_start = omp_get_wtime()
     call solve_household()
+    time_solve_household = omp_get_wtime() - phase_start
 
     ! calculate the distribution of households over state space
+    phase_start = omp_get_wtime()
     call get_distribution()
+    time_get_distribution = omp_get_wtime() - phase_start
 
     ! aggregate individual decisions
+    phase_start = omp_get_wtime()
     call aggregation()
+    time_aggregation = omp_get_wtime() - phase_start
+    total_runtime = omp_get_wtime() - total_start
 
     ! stop the clock
     call toc()
+
+    call write_runtime_report(total_runtime, time_solve_household, &
+                              time_get_distribution, time_aggregation)
 
     call output()
 
@@ -42,6 +56,34 @@ program LaborSupply
     close(21)
 
 contains
+
+    ! writes a plain-text report of total and phase-specific runtimes
+    subroutine write_runtime_report(total_time, solve_time, distribution_time, aggregation_time)
+
+        implicit none
+        real*8, intent(in) :: total_time, solve_time, distribution_time, aggregation_time
+        integer :: iunit, ios
+        character(len=200) :: iomsg
+
+        open(newunit=iunit, file='runtime_report.txt', status='replace', &
+             action='write', iostat=ios, iomsg=iomsg)
+        if(ios /= 0)then
+            write(*,'(a,a)')'Unable to write runtime_report.txt: ', trim(iomsg)
+            return
+        endif
+
+        write(iunit,'(a)')'Runtime report'
+        write(iunit,'(a)')'--------------'
+        write(iunit,'(a,f12.6,a)')'Total runtime:       ', total_time, ' seconds'
+        write(iunit,'(a,f12.6,a)')'solve_household:     ', solve_time, ' seconds'
+        write(iunit,'(a,f12.6,a)')'get_distribution:    ', distribution_time, ' seconds'
+        write(iunit,'(a,f12.6,a)')'aggregation:         ', aggregation_time, ' seconds'
+        write(iunit,'(a)')''
+        write(iunit,'(a)')'Notes: total runtime covers solve_household, get_distribution, and aggregation.'
+
+        close(iunit)
+
+    end subroutine
 
 
     ! initializes all remaining variables

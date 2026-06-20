@@ -16,4 +16,4 @@ nmake /f makefile_win
 nmake /f makefile_win run
 ```
 
-The run writes the table `output.out` in this folder. Plotting calls are currently commented out in `sol_prog10_07.f90` so the model does not require `gnuplot`.
+The run writes the table `output.out` and timing file `runtime_report.txt` in this folder. Plotting calls are currently commented out in `sol_prog10_07.f90` so the model does not require `gnuplot`.
