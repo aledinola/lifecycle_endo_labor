@@ -52,8 +52,7 @@ with
 \[
 a'\geq 0,\quad 0\leq l\leq 1,\quad c\geq 0.
 \]
-Given $a'$, labor supply has the following closed-form expression in the
-Fortran code. Define
+Given $a'$, labor supply has the following closed-form expression. Define
 \[
 available=(1+r)a+pen_j,\quad wage=w e_j\theta\eta.
 \]
@@ -159,10 +158,10 @@ Markov shock, corresponding to $z$ in the toolkit notation. Assets $a$ are
 the endogenous state, while $a'$ is the next-period asset choice.
 
 Labor $l$ is conceptually a decision variable, so it corresponds to $d$ in
-the toolkit notation. However, because the Fortran code computes $l$ in
-closed form as a function of $a'$, $a$, $\eta$, $j$, and $\theta$, we do not
-need to declare a separate $d$ grid. The return function can instead compute
-labor internally and use $(aprime,a,z)$ as the relevant action-state inputs,
-with age $j$ handled through the finite-horizon setup.
+the toolkit notation. However, because the closed-form solution gives $l$ as
+a function of $a'$, $a$, $\eta$, $j$, and $\theta$, we do not need to declare
+a separate $d$ grid. The return function can instead compute labor internally
+and use $(aprime,a,z)$ as the relevant action-state inputs, with age $j$
+handled through the finite-horizon setup.
 
 \end{document}
