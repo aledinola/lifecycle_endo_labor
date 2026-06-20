@@ -164,4 +164,18 @@ a separate $d$ grid. The return function can instead compute labor internally
 and use $(aprime,a,z)$ as the relevant action-state inputs, with age $j$
 handled through the finite-horizon setup.
 
+\section{Run-Time Comparison}
+
+\begin{center}
+\begin{tabular}{lcc}
+\hline
+Step & Fortran (s) & MATLAB (s)\\
+\hline
+solve\_household (VFI) & 0.180744 & \\
+distribution & 0.013257 & \\
+aggregation (moments) & 0.001517 & \\
+\hline
+\end{tabular}
+\end{center}
+
 \end{document}
