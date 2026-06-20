@@ -52,6 +52,26 @@ with
 \[
 a'\geq 0,\quad 0\leq l\leq 1,\quad c\geq 0.
 \]
+Given $a'$, labor supply has the following closed-form expression in the
+Fortran code. Define
+\[
+available=(1+r)a+pen_j,\quad wage=w e_j\theta\eta.
+\]
+For working ages, $j<J_R$,
+\[
+\tilde l(a',a,\eta,j,\theta)
+=\nu +(1-\nu)\frac{a'-available}{wage},
+\]
+and the implemented labor supply is
+\[
+l(a',a,\eta,j,\theta)
+=\min\left\{\max\left\{\tilde l(a',a,\eta,j,\theta),0\right\},
+1-10^{-10}\right\}.
+\]
+For retirement ages, $j\geq J_R$,
+\[
+l(a',a,\eta,j,\theta)=0.
+\]
 The policy functions are
 \begin{eqnarray*}
 a' &=& g_a(a,\eta,j,\theta),\\
@@ -130,5 +150,19 @@ The initial distribution is
 \end{cases}
 \]
 \end{itemize}
+
+\section{Mapping Into VFI-Toolkit Notation}
+
+In VFI-Toolkit notation, $\theta$ is a permanent type and should be handled
+through the permanent-type dimension. The shock $\eta$ is the exogenous
+Markov shock, corresponding to $z$ in the toolkit notation. Assets $a$ are
+the endogenous state, while $a'$ is the next-period asset choice.
+
+Labor $l$ is conceptually a decision variable, so it corresponds to $d$ in
+the toolkit notation. However, because the Fortran code computes $l$ in
+closed form as a function of $a'$, $a$, $\eta$, $j$, and $\theta$, we do not
+need to declare a separate $d$ grid. The return function can instead compute
+labor internally and use $(aprime,a,z)$ as the relevant action-state inputs,
+with age $j$ handled through the finite-horizon setup.
 
 \end{document}
