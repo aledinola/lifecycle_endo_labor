@@ -1,0 +1,8 @@
+Runtime report
+--------------
+Total runtime:           0.197928 seconds
+solve_household:         0.183069 seconds
+get_distribution:        0.013366 seconds
+aggregation:             0.001492 seconds
+
+Notes: total runtime covers solve_household, get_distribution, and aggregation.

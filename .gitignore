@@ -2,18 +2,45 @@
 codes_fortran/obj/
 codes_fortran/exe/
 codes_fortran/*.mod
+codes_fortran/*.smod
 codes_fortran/*.obj
-codes_fortran/output.out
-codes_fortran/output.txt
-codes_fortran/runtime_report.txt
-codes_fortran/gnufigure_*
+codes_fortran/*.o
+codes_fortran/*.exe
+codes_fortran/*.pdb
+codes_fortran/*.ilk
+codes_fortran/*.lib
+codes_fortran/*.exp
+codes_fortran/*.optrpt
 
 # TeX build artifacts
 tex_pdf/*.aux
+tex_pdf/*.aaa
+tex_pdf/*.bbl
+tex_pdf/*.bcf
+tex_pdf/*.blg
+tex_pdf/*.fdb_latexmk
+tex_pdf/*.fls
+tex_pdf/*.lof
 tex_pdf/*.log
+tex_pdf/*.lot
+tex_pdf/*.nav
 tex_pdf/*.out
-tex_pdf/*.toc
+tex_pdf/*.run.xml
+tex_pdf/*.snm
 tex_pdf/*.synctex.gz
+tex_pdf/*.toc
+
+# MATLAB build/cache artifacts
+codes_matlab/**/*.asv
+codes_matlab/**/*~
+codes_matlab/**/*.m~
+codes_matlab/**/*.mexw64
+codes_matlab/**/*.mexw32
+codes_matlab/**/*.mexmaci64
+codes_matlab/**/*.mexa64
+codes_matlab/**/slprj/
+codes_matlab/**/codegen/
+codes_matlab/**/.SimulinkProject/
 
 # OS/editor noise
 .DS_Store
