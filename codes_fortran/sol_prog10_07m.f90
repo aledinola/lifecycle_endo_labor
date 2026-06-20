@@ -37,13 +37,8 @@ module globals
 
     ! household risk process
     real*8, parameter :: sigma_theta = 0.242d0
-    ! variance of the transitory shock innovation
     real*8, parameter :: sigma_eps   = 0.022d0
     real*8, parameter :: rho         = 0.985d0
-
-    ! pension parameters
-    real*8, parameter :: pension_replacement = 0.5d0
-    real*8, parameter :: pension_contribution_rate = 0.33d0
 
     ! size of the asset grid
     real*8, parameter :: a_l    = 0.0d0

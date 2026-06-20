@@ -128,7 +128,7 @@ contains
 
         ! old-age transfers
         pen = 0d0
-        pen(JR:JJ) = pension_replacement*sum(eff)/dble(JR-1)*pension_contribution_rate
+        pen(JR:JJ) = 0.5d0*sum(eff)/dble(JR-1)*0.33d0
 
         ! initialize fixed effect
         dist_theta = 1d0/dble(NP)
