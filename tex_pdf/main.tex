@@ -186,9 +186,11 @@ total & 0.195519 & \\
 \end{center}
 
 The Fortran code was compiled with Intel oneAPI \texttt{ifx} using the
-makefile option string \texttt{/warn:all /Qopenmp /O2}. The speed-relevant
-options are \texttt{/O2}, which enables compiler optimization, and
-\texttt{/Qopenmp}, which enables OpenMP support. The \texttt{/warn:all}
-option is diagnostic rather than performance-oriented.
+makefile option string \texttt{/warn:all /Qopenmp /O2}. The computation is
+serial: there are no OpenMP parallel directives in the model code. The
+speed-relevant option is \texttt{/O2}, which enables compiler optimization.
+The \texttt{/Qopenmp} option is used to enable OpenMP runtime support for
+\texttt{omp\_get\_wtime()}, the timer used for the runtime measurements.
+The \texttt{/warn:all} option is diagnostic rather than performance-oriented.
 
 \end{document}
