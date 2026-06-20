@@ -15,6 +15,7 @@ codes_fortran/*.optrpt
 # TeX build artifacts
 tex_pdf/*.aux
 tex_pdf/*.aaa
+tex_pdf/*.bak
 tex_pdf/*.bbl
 tex_pdf/*.bcf
 tex_pdf/*.blg
