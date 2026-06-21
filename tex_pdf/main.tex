@@ -176,14 +176,19 @@ handled through the finite-horizon setup.
 \hline
 Step & Fortran (s) & MATLAB (s)\\
 \hline
-solve\_household (VFI) & 0.180744 & \\
-distribution & 0.013257 & \\
-aggregation (moments) & 0.001517 & \\
+solve\_household (VFI) & 0.182225 & 0.896763\\
+distribution & 0.013436 & 0.077600\\
+aggregation (moments) & 0.001490 & 2.965766\\
 \hline
-total & 0.195519 & \\
+total & 0.197152 & 3.940129\\
 \hline
 \end{tabular}
 \end{center}
+
+The MATLAB timings were obtained from the VFI-Toolkit implementation in
+\texttt{codes\_matlab/main.m}. The reported MATLAB total is the sum of the
+value-function iteration, distribution, and model-moment evaluation steps;
+it does not include writing the output table or plotting.
 
 The Fortran code was compiled with Intel oneAPI \texttt{ifx} using the
 makefile option string \texttt{/warn:all /Qopenmp /O2}. The computation is

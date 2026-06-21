@@ -1,0 +1,8 @@
+Runtime report
+--------------
+Total runtime:           3.940129 seconds
+solve_household:         0.896763 seconds
+get_distribution:        0.077600 seconds
+aggregation:             2.965766 seconds
+
+Notes: total runtime covers VFI, distribution, and model moment evaluation.
