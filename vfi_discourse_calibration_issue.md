@@ -262,3 +262,109 @@ Suggested stress cases:
 I would defer the semi-exogenous-shock branch to a separate artificial test,
 because the current model does not use semi-exogenous shocks and would need
 additional setup just to reach that code path.
+
+## Stress test run results
+
+Run date: June 24, 2026.
+
+The stress cases were run one at a time from `codes_matlab/` using commands of
+the form:
+
+```matlab
+stress_case='baseline'; main_calibration
+```
+
+### `baseline`
+
+Completed successfully. The calibration recovered the target-generating
+parameters:
+
+```text
+stress_case:           baseline
+initial beta:              0.950000
+initial nu:                0.400000
+true beta:                 0.980000
+true nu:                   0.335000
+estimated beta:            0.979999
+estimated nu:              0.335006
+objective:             9.175600e-07
+```
+
+### `named_logmoments`
+
+This case failed before the optimizer. MATLAB reported:
+
+```text
+Unrecognized field name "AllStats".
+
+Error in CalibrateLifeCycleModel_PType (line 293)
+        caliboptions.logmoments(sofar+1:sofar+acscummomentsizes(1))=logmomentnames.AllStats.(acsmomentnames{1,1}).(acsmomentnames{1,2})*ones(acscummomentsizes(1),1); % Note: *ones() at end is so you can input 1 for a vector parameter and then this becomes a vector of ones
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error in main_calibration (line 162)
+[CalibParams, calibsummary] = CalibrateLifeCycleModel_PType( ...
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+### `vector_logmoments`
+
+Completed successfully with the all-zero vector:
+
+```text
+stress_case:           vector_logmoments
+initial beta:              0.950000
+initial nu:                0.400000
+true beta:                 0.980000
+true nu:                   0.335000
+estimated beta:            0.979999
+estimated nu:              0.335006
+objective:             9.175600e-07
+```
+
+Because the vector was `[0; 0]`, it did not enter the
+`elseif any(caliboptions.logmoments>0)` branch.
+
+### `ptype_theta`
+
+This case failed after the optimizer, during final calibrated-parameter output
+reconstruction. MATLAB reported:
+
+```text
+Unrecognized function or variable 'CalibParams'.
+
+Error in CalibrateLifeCycleModel_PType (line 430)
+            if isfield(CalibParams,CalibParamNames{nCalibParamsFinder(pp,1)})
+                       ^^^^^^^^^^^
+Error in main_calibration (line 162)
+[CalibParams, calibsummary] = CalibrateLifeCycleModel_PType( ...
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+### `custom_stats`
+
+Completed successfully with the added `CustomModelStats` targets:
+
+```text
+stress_case:           custom_stats
+initial beta:              0.950000
+initial nu:                0.400000
+true beta:                 0.980000
+true nu:                   0.335000
+estimated beta:            0.979999
+estimated nu:              0.335006
+objective:             5.295221e-08
+```
+
+### `atoB_constraints`
+
+Completed successfully with explicit bounded constraints:
+
+```text
+stress_case:           atoB_constraints
+initial beta:              0.950000
+initial nu:                0.400000
+true beta:                 0.980000
+true nu:                   0.335000
+estimated beta:            0.979999
+estimated nu:              0.335008
+objective:             1.104013e-07
+```
