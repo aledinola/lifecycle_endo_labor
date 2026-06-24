@@ -2,7 +2,6 @@ clear, clc, close all
 
 toolkit_path = 'C:/Users/aledi/OneDrive/Documents/GitHub/VFIToolkit-matlab';
 addpath(genpath(toolkit_path));
-addpath(pwd);
 
 %% Set parameters and grids
 [Params, a_grid, z_grid, pi_z, Names_i, jequaloneDist, vfoptions, simoptions, ...
@@ -56,12 +55,12 @@ runtime.total = runtime.solve_household + runtime.get_distribution + runtime.agg
 
 %% Report run times
 fprintf('Runtime report\n');
-fprintf( '--------------\n');
-fprintf( 'Total runtime:       %12.6f seconds\n', runtime.total);
-fprintf( 'solve_household:     %12.6f seconds\n', runtime.solve_household);
-fprintf( 'get_distribution:    %12.6f seconds\n', runtime.get_distribution);
-fprintf( 'aggregation:         %12.6f seconds\n', runtime.aggregation);
-fprintf( '\n');
+fprintf('--------------\n');
+fprintf('Total runtime:       %12.6f seconds\n', runtime.total);
+fprintf('solve_household:     %12.6f seconds\n', runtime.solve_household);
+fprintf('get_distribution:    %12.6f seconds\n', runtime.get_distribution);
+fprintf('moments by age:      %12.6f seconds\n', runtime.aggregation);
+fprintf('\n');
 fprintf( 'Notes: total runtime covers VFI, distribution, and model moment evaluation.\n');
 
 %% Make plots
@@ -89,3 +88,39 @@ ylabel('Assets')
 grid on
 
 disp('MATLAB VFI-Toolkit run complete.')
+
+%% Toy calibration
+
+% --- Set targets here
+TargetMoments.AgeConditionalStats.assets.Mean = ave.assets;
+hours_target = ave.hours;
+hours_target(~Params.working) = NaN;
+TargetMoments.AgeConditionalStats.hours.Mean = hours_target;
+% --- Choose which parameters to calibrate
+CalibParamNames = {'beta', 'nu'};
+
+% --- Set caliboptions
+ParametrizeParamsFn = [];
+caliboptions = struct();
+caliboptions.fminalgo = 8; % 8 = lsqnonlin least-squares; 1 = fminsearch simplex
+caliboptions.constrain0to1 = {'beta', 'nu'}; % Keep beta and nu inside (0,1)
+caliboptions.verbose = 1; % Print parameter values and objective during calibration
+caliboptions.weights = 1; % Equal weight on every non-NaN targeted moment
+
+%vfoptions.n_semiz = 0; % No semi-exogenous shocks; calibration expects this field
+
+tic
+[CalibParams, calibsummary] = CalibrateLifeCycleModel_PType( ...
+    CalibParamNames, TargetMoments, n_d, n_a, n_z, N_j, Names_i, ...
+    d_grid, a_grid, z_grid, pi_z, ReturnFn, Params, ...
+    DiscountFactorParamNames, jequaloneDist, AgeWeightParamNames, ...
+    PTypeDistParamNames, ParametrizeParamsFn, FnsToEvaluate, ...
+    caliboptions, vfoptions, simoptions);
+runtime.calibration = toc;
+
+fprintf('\nToy calibration results\n');
+fprintf('-----------------------\n');
+fprintf('beta:                  %12.6f\n', CalibParams.beta);
+fprintf('nu:                    %12.6f\n', CalibParams.nu);
+fprintf('objective:             %12.6e\n', calibsummary.objvalue);
+fprintf('calibration runtime:   %12.6f seconds\n', runtime.calibration);
