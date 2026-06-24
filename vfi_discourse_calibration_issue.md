@@ -20,6 +20,9 @@ hours_target(~Params.working) = NaN;
 TargetMoments.AgeConditionalStats.hours.Mean = hours_target;
 
 CalibParamNames = {'beta', 'nu'};
+ParamsCalib0 = Params;
+ParamsCalib0.beta = 0.95;
+ParamsCalib0.nu = 0.40;
 ParametrizeParamsFn = [];
 caliboptions = struct();
 caliboptions.fminalgo = 8;
@@ -29,7 +32,7 @@ caliboptions.weights = 1;
 
 [CalibParams, calibsummary] = CalibrateLifeCycleModel_PType( ...
     CalibParamNames, TargetMoments, n_d, n_a, n_z, N_j, Names_i, ...
-    d_grid, a_grid, z_grid, pi_z, ReturnFn, Params, ...
+    d_grid, a_grid, z_grid, pi_z, ReturnFn, ParamsCalib0, ...
     DiscountFactorParamNames, jequaloneDist, AgeWeightParamNames, ...
     PTypeDistParamNames, ParametrizeParamsFn, FnsToEvaluate, ...
     caliboptions, vfoptions, simoptions);
@@ -88,13 +91,19 @@ vfoptions.n_semiz = 0;
 ```
 
 With that line in the calling script, the toy calibration runs to completion on
-my machine. Since the data targets are generated from the same model, the
-calibration recovers the initial values:
+my machine. To avoid a trivial test, I generated the targets with
+`beta = 0.98` and `nu = 0.335`, but initialized the calibration from
+`beta = 0.95` and `nu = 0.40`. The calibration recovered the target-generating
+values:
 
 ```text
-beta:                      0.980000
-nu:                        0.335000
-objective:             0.000000e+00
+initial beta:              0.950000
+initial nu:                0.400000
+target beta:               0.980000
+target nu:                 0.335000
+beta:                      0.979999
+nu:                        0.335006
+objective:             9.175600e-07
 ```
 
 ## Tentative toolkit-side fix
@@ -116,3 +125,140 @@ if isfield(vfoptions, 'n_semiz') && prod(vfoptions.n_semiz) > 0
 
 I have not modified the toolkit files. This note is only documenting the issue
 and the likely workaround.
+
+## Additional issues to stress test later
+
+After proofreading `CalibrateLifeCycleModel_PType.m`,
+`CalibrateLifeCycleModel_PType_objectivefn.m`, and the target-setup helper
+`SetupTargetMoments_FHorz.m`, I found a few code paths that are not exercised
+by the baseline toy calibration above but may contain bugs.
+
+### Suspected toolkit issues
+
+1. Semi-exogenous shock branch may reference an undefined variable.
+
+   In `CalibrateLifeCycleModel_PType.m`, the branch
+
+   ```matlab
+   if prod(vfoptions.n_semiz)>0
+       ...
+       if any(strcmp(GEPriceParamNames, vfoptions.SemiExoShockFnParamNames(ff)))
+   ```
+
+   appears to use `GEPriceParamNames`, which is not an input to
+   `CalibrateLifeCycleModel_PType` and does not appear to be defined locally.
+   This may only appear when `vfoptions.n_semiz > 0` and
+   `vfoptions.SemiExoShockFn` is present. The analogous exogenous-shock branch
+   uses `CalibParamNames`, so that may be the intended variable here.
+
+2. Named `AgeConditionalStats` log moments may read the wrong structure.
+
+   In `CalibrateLifeCycleModel_PType.m`, the named-logmoments branch for
+   `AgeConditionalStats` appears to check
+   `logmomentnames.AllStats...` instead of
+   `logmomentnames.AgeConditionalStats...`. This is not exercised when
+   `caliboptions.logmoments = 0`.
+
+3. Vector-valued `caliboptions.logmoments` may be broken.
+
+   The vector-logmoments branch references `allstatmomentsizes` and
+   `acsmomentsizes`, but those variables do not appear to be available in the
+   parent function after calling `SetupTargetMoments_FHorz`. There may also be
+   indexing issues in this block.
+
+4. PType-matrix calibrated parameters may be reconstructed incorrectly.
+
+   Near the final reconstruction of calibrated parameters,
+   `CalibrateLifeCycleModel_PType.m` loops over `pp` but uses `ii` in
+   expressions such as `temp(ii,:)` and `temp(:,ii)`. If `ii` is stale from an
+   earlier loop, calibrated PType-specific matrix/vector parameters may be put
+   back into the wrong row/column or may error.
+
+5. Deeply nested PType target parsing may contain an index typo.
+
+   In `SetupTargetMoments_FHorz.m`, deeper nested target parsing contains
+   assignments involving `a2vec{a3}`. These look like they may be typos for
+   `a2vec{a2}`. This would only be hit by more complex PType-specific target
+   structures than the current baseline test uses.
+
+## Proposed future stress tests in `main_calibration.m`
+
+Do not replace the successful baseline test. Instead, add a small switch so
+that future sessions can run one stress case at a time:
+
+```matlab
+stress_case = "baseline";
+% Other possible values:
+% "named_logmoments"
+% "vector_logmoments"
+% "ptype_theta"
+% "custom_stats"
+% "atoB_constraints"
+```
+
+Suggested stress cases:
+
+1. `named_logmoments`
+
+   Keep the same age-conditional targets, but add:
+
+   ```matlab
+   caliboptions.logmoments = struct();
+   caliboptions.logmoments.AgeConditionalStats.hours.Mean = 0;
+   ```
+
+   Using zero should test named logmoment parsing without actually logging the
+   hours targets. This may expose the apparent `AllStats` versus
+   `AgeConditionalStats` typo.
+
+2. `vector_logmoments`
+
+   Keep the same two target groups and set:
+
+   ```matlab
+   caliboptions.logmoments = [0; 0];
+   ```
+
+   This should exercise the vector logmoments branch and may expose the
+   missing `allstatmomentsizes` / `acsmomentsizes` variables.
+
+3. `ptype_theta`
+
+   Add a separate calibration that includes the PType-dependent parameter
+   `theta`, initialized away from the target-generating values. For example:
+
+   ```matlab
+   CalibParamNames = {'theta'};
+   ParamsCalib0.theta = [0.80; 1.40];
+   caliboptions.constrainpositive = {'theta'};
+   ```
+
+   This should stress PType-specific parameter expansion and final output
+   reconstruction. The exact initial values should be chosen to remain
+   economically sensible for the model.
+
+4. `custom_stats`
+
+   Add a `TargetMoments.CustomModelStats` block, for example targeting overall
+   mean assets and mean working-age hours. Define a tiny local function at the
+   end of `main_calibration.m` to compute those same statistics from the model
+   objects. This would test the `CustomModelStats` branch in both setup and
+   objective evaluation.
+
+5. `atoB_constraints`
+
+   Replace `constrain0to1` with explicit bounded constraints:
+
+   ```matlab
+   caliboptions = rmfield(caliboptions, 'constrain0to1');
+   caliboptions.constrainAtoB = {'beta', 'nu'};
+   caliboptions.constrainAtoBlimits.beta = [0.90, 0.995];
+   caliboptions.constrainAtoBlimits.nu = [0.20, 0.60];
+   ```
+
+   This keeps the economics sensible while testing another parameter-transform
+   path.
+
+I would defer the semi-exogenous-shock branch to a separate artificial test,
+because the current model does not use semi-exogenous shocks and would need
+additional setup just to reach that code path.

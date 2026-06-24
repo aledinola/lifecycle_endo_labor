@@ -98,6 +98,9 @@ hours_target(~Params.working) = NaN;
 TargetMoments.AgeConditionalStats.hours.Mean = hours_target;
 % --- Choose which parameters to calibrate
 CalibParamNames = {'beta', 'nu'};
+ParamsCalib0 = Params;
+ParamsCalib0.beta = 0.95; % Initial guess, target-generating value is 0.98
+ParamsCalib0.nu = 0.40; % Initial guess, target-generating value is 0.335
 
 % --- Set caliboptions
 ParametrizeParamsFn = [];
@@ -107,12 +110,12 @@ caliboptions.constrain0to1 = {'beta', 'nu'}; % Keep beta and nu inside (0,1)
 caliboptions.verbose = 1; % Print parameter values and objective during calibration
 caliboptions.weights = 1; % Equal weight on every non-NaN targeted moment
 
-%vfoptions.n_semiz = 0; % No semi-exogenous shocks; calibration expects this field
+vfoptions.n_semiz = 0; % No semi-exogenous shocks; calibration expects this field
 
 tic
 [CalibParams, calibsummary] = CalibrateLifeCycleModel_PType( ...
     CalibParamNames, TargetMoments, n_d, n_a, n_z, N_j, Names_i, ...
-    d_grid, a_grid, z_grid, pi_z, ReturnFn, Params, ...
+    d_grid, a_grid, z_grid, pi_z, ReturnFn, ParamsCalib0, ...
     DiscountFactorParamNames, jequaloneDist, AgeWeightParamNames, ...
     PTypeDistParamNames, ParametrizeParamsFn, FnsToEvaluate, ...
     caliboptions, vfoptions, simoptions);
@@ -120,7 +123,11 @@ runtime.calibration = toc;
 
 fprintf('\nToy calibration results\n');
 fprintf('-----------------------\n');
-fprintf('beta:                  %12.6f\n', CalibParams.beta);
-fprintf('nu:                    %12.6f\n', CalibParams.nu);
+fprintf('initial beta:          %12.6f\n', ParamsCalib0.beta);
+fprintf('initial nu:            %12.6f\n', ParamsCalib0.nu);
+fprintf('true beta:             %12.6f\n', Params.beta);
+fprintf('true nu:               %12.6f\n', Params.nu);
+fprintf('estimated beta:        %12.6f\n', CalibParams.beta);
+fprintf('estimated nu:          %12.6f\n', CalibParams.nu);
 fprintf('objective:             %12.6e\n', calibsummary.objvalue);
 fprintf('calibration runtime:   %12.6f seconds\n', runtime.calibration);
