@@ -267,11 +267,11 @@ additional setup just to reach that code path.
 
 Run date: June 24, 2026.
 
-The stress cases were run one at a time from `codes_matlab/` using commands of
-the form:
+The stress cases were run one at a time from `codes_matlab/` by editing the
+one-line selector in `main_calibration.m`:
 
 ```matlab
-stress_case='baseline'; main_calibration
+stress_case = "baseline";
 ```
 
 ### `baseline`
