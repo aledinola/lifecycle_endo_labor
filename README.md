@@ -24,10 +24,12 @@ The plotting calls are currently commented out so the baseline run does not requ
 
 ## MATLAB Plan
 
-The MATLAB side will use VFI-Toolkit from:
+The MATLAB side will use VFI-Toolkit. Add your local VFI-Toolkit checkout to
+the MATLAB path before running MATLAB code, for example:
 
-```text
-C:\Users\aledi\OneDrive\Documents\GitHub\VFIToolkit-matlab
+```matlab
+addpath(genpath('C:\path\to\VFIToolkit-matlab'))
 ```
 
-Reference examples are available locally in `IntroToLifeCycleModels` and `IntroToOLGModels`, and online under the `vfitoolkit` GitHub organization.
+Reference examples are available in `IntroToLifeCycleModels` and
+`IntroToOLGModels`, and online under the `vfitoolkit` GitHub organization.
